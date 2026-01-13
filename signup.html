@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Leadiary Beta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #0B0B0B; color: #fff; }
+        .input-dark { background-color: #141414; border: 1px solid #222; }
+        .input-dark:focus { border-color: #FF6A00; outline: none; }
+        .btn-primary { background-color: #FF6A00; color: #0B0B0B; }
+        .btn-primary:hover { background-color: #e55e00; }
+    </style>
+</head>
+<body class="font-sans flex items-center justify-center min-h-screen p-4">
+
+    <div class="max-w-md w-full bg-[#141414] border border-[#222] p-8 rounded-2xl shadow-2xl">
+        <div class="text-center mb-8">
+            <div class="w-12 h-12 bg-[#FF6A00]/10 text-[#FF6A00] rounded-xl flex items-center justify-center text-2xl mx-auto mb-4 border border-[#FF6A00]/20">
+                🚀
+            </div>
+            <h1 class="text-2xl font-bold mb-2">Get Early Access</h1>
+            <p class="text-gray-400 text-sm">Join founders using Leadiary to find customers automatically.</p>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Email Address</label>
+                <input type="email" id="emailInput" placeholder="founder@startup.com" 
+                    class="w-full input-dark rounded-lg px-4 py-3 text-white transition-colors">
+            </div>
+
+            <button onclick="joinWaitlist()" id="joinBtn"
+                class="w-full btn-primary font-bold py-3 rounded-lg transition-all flex justify-center items-center gap-2">
+                Join the Waitlist
+            </button>
+            
+            <p id="statusMsg" class="text-center text-sm min-h-[20px] text-gray-500 mt-2"></p>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-[#222] text-center">
+            <a href="index.html" class="text-gray-500 hover:text-white text-xs">← Back to Homepage</a>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS WITH YOUR ACTUAL KEY
+        const SUPABASE_URL = "https://ghvukliddwptqozsaian.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdodnVrbGlkZHdwdHFvenNhaWFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNzk3NjcsImV4cCI6MjA4MzY1NTc2N30.VYBsUIflYKRWO8ZF00Ma9GcAA7zmnPXcry3N6NMI8R8"; // <--- PASTE KEY HERE
+
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function joinWaitlist() {
+            const emailInput = document.getElementById('emailInput');
+            const joinBtn = document.getElementById('joinBtn');
+            const statusMsg = document.getElementById('statusMsg');
+            const email = emailInput.value.trim();
+
+            if (!email || !email.includes('@')) {
+                statusMsg.innerText = "Please enter a valid email.";
+                statusMsg.className = "text-center text-sm text-red-500 mt-2";
+                return;
+            }
+
+            joinBtn.innerText = "Securing spot...";
+            joinBtn.disabled = true;
+
+            const { data, error } = await db.from('waitlist').insert([{ email: email }]);
+
+            if (error) {
+                console.error(error);
+                joinBtn.innerText = "Try Again";
+                joinBtn.disabled = false;
+                statusMsg.innerText = "Error. Please try again.";
+            } else {
+                joinBtn.innerText = "You're in! 🎉";
+                joinBtn.className = "w-full bg-[#222] text-gray-400 font-bold py-3 rounded-lg cursor-default";
+                emailInput.value = "";
+                statusMsg.innerText = "We'll notify you when we launch.";
+                statusMsg.className = "text-center text-sm text-[#FF6A00] mt-2";
+            }
+        }
+    </script>
+</body>
+</html>
